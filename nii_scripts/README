@@ -1,0 +1,302 @@
+###########################################################################
+##  prodject-CURRENNT-scrits -------------------------------------------  #
+## ---------------------------------------------------------------------  #
+##                                                                        #
+##  Copyright (c) 2018  National Institute of Informatics                 #
+##                                                                        #
+##  THE NATIONAL INSTITUTE OF INFORMATICS AND THE CONTRIBUTORS TO THIS    #
+##  WORK DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING  #
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT    #
+##  SHALL THE NATIONAL INSTITUTE OF INFORMATICS NOR THE CONTRIBUTORS      #
+##  BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY   #
+##  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,       #
+##  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS        #
+##  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE   #
+##  OF THIS SOFTWARE.                                                     #
+###########################################################################
+##                         Author: Xin Wang                               #
+##                         Date:   2016 - 2019                            #
+##                         Contact: wangxin at nii.ac.jp                  #
+###########################################################################
+
+This repository contains the scripts to use CURRENNT
+\- waveform-modeling: scripts for waveform models
+\- acoustic-modeling: scripts for acoustic models
+
+Please install CURRENNT and pyTools before using this repository.
+https://github.com/nii-yamagishilab/project-CURRENNT-public
+
+Please also install sox http://sox.sourceforge.net
+
+Please modify the environment variables in ./init.sh
+
+Please read the intruction below to use this repository.
+
+----------------- 1. waveform models --------------------
+./waveform-modeling
+
+ | - DATA
+  Directory to store the data for model training (validation will be selected
+  automatically from these data)
+
+  - TESTDATA
+  Directory to store the data for test
+  
+  - TESTDATA-for-pretrained
+  Directory to store the data for test for the project-WaveNet-pretrained
+  and project-NSF-pretrained
+
+  - SCRIPTS
+  Scripts of the training/generation processes
+
+  - project-NSF-v2-pretrained
+  Simplified and harmonic-plu-noise NSFs trained on SLT. This is a demonstration
+  script to generate waveforms from a trained NSF model.
+  These new NSF models are explained here: https://nii-yamagishilab.github.io/samples-nsf/nsf-v2.html
+
+  If you want to train models on your own corpus, please use the training scripts in project-NSF
+
+  - project-NSF-pretrained
+  Neural source-filter model trained on SLT. This is a demonstration
+  script to generate waveforms from a trained NSF model.
+  The samples have been uploaded to https://nii-yamagishilab.github.io/samples-nsf/nsf-v1.html
+  
+  Note: due to historical reason, meanstd.bin for these pre-trained NSF models were not calculated
+  using public-CURRENNT-scripts. Models project-NSF-pretrained can only use project-NSF-pretrained/meanstd.bin
+
+  If you want to train models on your own corpus, please use the training scripts in project-NSF
+  
+  - project-NSF
+  Scripts to train NSF on CMU-arctic SLT voice.
+  Note that project-NSF/MODELS contains both network.jsn for models in both project-NSF-pretrained/MODELS
+  and project-NSF-v2-pretrained/MODELS:
+   ./project-NSF/MODELS
+     |- s-NSF:  simplified NSF, used in project-NSF-v2-pretrained/MODELS/s-NSF
+     |- h-NSF:   harmonic-plus-noise NSF, used in project-NSF-v2-pretrained/MODELS/h-NSF
+     |- h-sinc-NSF: h-NSF with trainable filters, used in project-NSF-v2-pretrained/MODELS/h-sinc-NSF
+     
+     |- NSF: baseline NSF, used in project-NSF-pretrained/MODELS/NSF
+     |- NSF-L3,  NSF-MSE,  NSF-N2,  NSF-S3, used in project-NSF-pretrained/MODELS/NSF-*
+    
+
+  - project-WaveNet-pretrained
+  Wavenet trained on SLT. This is a demonstration
+  script to generate waveforms from a trained WaveNet model.
+  The samples have been uploaded to https://nii-yamagishilab.github.io/samples-nsf/nsf-v1.html
+  
+  - project-WaveNet
+  Scripts to train WaveNet on CMU-arctic SLT voice. 
+
+
+Usage:
+1. Install CURRENNT and pyTools, which can be downloaded from
+   https://github.com/nii-yamagishilab/project-CURRENNT-public
+
+2. For a quick check
+   2.1 modify the path in ./init.sh
+   
+   2.2 run commands:
+   $: source ./init.sh
+   $: cd waveform-modeling/project-NSF-pretrained/
+   $: run 01_gen.sh
+
+   Waveforms should be generated in ./waveform-modeling/project-NSF-pretrained/MODELS/NSF/output
+   
+2. For model training using the provided sample data
+   
+   $: source ./init.sh
+   $: cd waveform-modeling/project-NSF/
+   $: run 00_run.sh
+   
+   After which you can get a trained model in ./waveform-modeling/project-NSF/MODELS/h-sinc-NSF/trained_network.jsn
+
+   $: run 01_gen.sh
+   After which you can get some waveforms in ./waveform-modeling/project-NSF/MODELS/h-sinc-NSF/output
+
+   00_run.sh and 01_gen.sh are only for demonstration. Please don't expect good output since the model
+   is only trained using less than 10 utterances.
+   
+   To train a good model, you may need to use the whole data from one speaker of the CMU-arctic corpus.
+
+3. For training using your own data (or CMU-arctic data):
+   1. Put waveforms and acoustic features in ./DATA, which stores the training data (validation data will be
+      automatically selected from ./DATA)
+   2. Read and configure config.py in project-NSF or project-Wavenet
+   3. Run 00_run.sh
+   4. Put test data in ./TESTDATA, configure config.py and Run 01_gen.sh
+
+
+----------------- 2. acoustic models --------------------
+./acoustic-modeling
+
+|- DATA
+  Directory to store the data for model training (for demonstration)
+  
+ - TESTDATA
+  Directory to store the data for test (for demonstration)
+  
+ - project-DAR-continuous
+  Project scripts to train a DAR for continuous-valued output features.
+  The demonstration is for training a DAR model that does
+     ppg, xvector, f0 -> Mel-spectrogram
+
+ - project-RNN
+  Project scripts to train a RNN for continuous-valued output features.
+  The demonstration is for training an RNN that does
+     linguistic_features, one-hot_speaker_vector -> MGC, LF0, UV, BAP
+     
+ - SCRIPTS
+  General scripts of the training/generation processes.
+
+
+Usage: please read README in project-***, and follow the steps to use
+
+---------------------- Notes -----------------------------------
+--------
+Data IO:
+   1. All the feature files except waveforms should be saved as binary, float32, little-endian.
+      You may check the data included in waveform-modeling/TESTDATA-for-pretrained/mfbsp/*.
+      $: source ./init.sh
+      $: python
+      >>> from ioTools import readwrite
+      >>> mel = readwrite.read_raw_mat('./waveform-modeling/TESTDATA-for-pretrained/mfbsp/arctic_a0001.mfbsp', 80)
+      >>> mel.shape
+      (671, 80)
+      >>> mel[0]
+      array([-0.5804557 ,  0.64407444,  0.95468473,  0.9076864 ,  0.7409921 ,
+        0.5190042 ,  0.2543492 ,  0.07272982, -0.02690054, -0.08740515,
+       -0.14761803, -0.24591875, -0.40614623, -0.49193513, -0.69396436,
+       -0.6916913 , -0.67114395, -0.7134891 , -0.8428167 , -0.9381612 ,
+       -0.9604182 , -1.020919  , -1.0435845 , -1.077764  , -1.1341914 ,
+       -1.2459651 , -1.2637303 , -1.3517176 , -1.3730341 , -1.4908298 ,
+       -1.5803422 , -1.6830492 , -1.495914  , -1.3974593 , -1.4675162 ,
+       -1.5840678 , -1.6725454 , -1.584573  , -1.7740629 , -2.0816884 ,
+       -1.8013108 , -1.7561418 , -2.1837492 , -2.3368633 , -2.0934896 ,
+       -2.2621613 , -2.200103  , -2.3064234 , -1.9597349 , -2.2220097 ,
+       -2.296505  , -2.0561726 , -2.4601874 , -1.997487  , -2.0367327 ,
+       -2.2498186 , -2.8739617 , -2.859662  , -2.680149  , -3.1865113 ,
+       -3.172631  , -2.8548572 , -3.0105433 , -2.7395592 , -2.7438028 ,
+       -2.625576  , -2.8859007 , -2.8262408 , -2.6442852 , -2.847031  ,
+       -2.9952297 , -2.9672284 , -2.6831682 , -3.2138064 , -3.3470006 ,
+       -3.4002392 , -2.8704414 , -2.958755  , -3.2552214 , -3.5245233 ],
+      dtype=float32)
+      >>> mel[0,0]
+      -0.5804557
+      >>> f0 = readwrite.read_raw_mat('./waveform-modeling/TESTDATA-for-pretrained/f0/arctic_a0001.f0', 1)
+      >>> f0.shape
+      (671,)
+
+      Here, the binary mel-spectrogram is a matrix with 671 frames and 80 dimenions/frame.
+      The F0 is one-dimensional vector with 671 frames. 
+      
+      Notice that in physical memory, one datum in a two dimensional data matrix (e.g., mel-spectrom) is 
+      accessed through DataArray[D * n + d], where D is the feature dimension, n is the frame index, and d is
+      the dimension index within one frame.
+
+   2. You can use numpy.tofile to write the data into binary,float32,litten-endian format.
+      You can also use the write_raw_mat function in pyTools, which is a wrapper of numpy.tofile
+      
+      $: source ./init.sh
+      $: python
+      >>> from ioTools import readwrite
+      >>> import numpy as np
+      >>> data = np.random.randn(10,2)
+      >>> data
+      array([[-1.0792218 , -2.00836936],
+             [-0.84080859,  1.81592092],
+             [ 0.48318553, -0.76937456],
+             [-1.90552536, -0.68052287],
+             [-0.72223174, -2.97435219],
+	     [ 0.19932163,  0.29391472],
+	     [ 0.36049151,  0.64871376],
+	     [ 0.73407896,  0.6574951 ],
+	     [ 0.5137015 , -0.67185778],
+	     [-0.62208806, -0.35707845]])
+      # write data to './tmp_data.bin'
+      >>> readwrite.write_raw_mat(data, 'tmp_data.bin')
+      True
+      # read data from './tmp_data.bin'
+      >>> data_read =readwrite.read_raw_mat('tmp_data.bin', 2)
+      # data_read should be the same to data
+      # (except for the nuemrical reason due to the conversion from
+      #  float64 to float32)
+      >>> data_read
+      array([[-1.0792218 , -2.0083694 ],
+      	     [-0.8408086 ,  1.815921  ],
+             [ 0.48318553, -0.76937455],
+	     [-1.9055253 , -0.68052286],
+	     [-0.72223175, -2.9743521 ],
+	     [ 0.19932163,  0.2939147 ],
+	     [ 0.3604915 ,  0.64871377],
+	     [ 0.73407894,  0.6574951 ],
+	     [ 0.5137015 , -0.6718578 ],
+	     [-0.6220881 , -0.35707846]], dtype=float32)
+
+--------
+Useful CURRENNT commands
+
+1. Continue training using epoch***.autosave
+   $: currennt --continue epoch***.autosave
+   
+   If autosave = true is configured in train_config.cfg, CURRENNT will save trained models after
+   every training epoch. The name of the saved model will be epoch***.autosave.
+
+   If the training is terminated for any reason, you can simply use the above command to resume
+   the training from the lastes training epoch.
+
+   No additional argument is needed because epoch***.autosave saves all the arguments, weights,
+   intermediate gradients ...
+   
+2. Convert ***.autosave to ***.jsn
+   $: currennt --print_weight_to epoch***.jsn --print_weight_opt 2 --cuda off --network epoch***.autosave
+
+   ***.autosave is the trained model after *** epochs. It can be used as a trained network to generate output.
+   However, ***.autosave training arguments, gradients, etc, which makes ***.autosave very large.
+
+   ***.jsn is the trained model, without data unnecessary for generation.
+
+   To save space, use the above command to convert ***.auto to ***.jsn.
+
+   Note that network.jsn usually denotes the initial network without any trained weight.
+   
+3. Plot the network typology
+   $: currennt --network_graph network.gv --network network.jsn --cuda off
+   $: dot -Tpdf -o network.pdf network.gv
+
+   Step1 converts network.jsn to network.gv, a file in dot-language
+   Step2 uses "dot" to produce a picture given the network.gv
+   You can check ./acoustic-modeling/project-DAR-continuous/MODELS/DAR_001/network.pdf
+
+4. For debugging, you can use
+   $: gdb --args currennt ***
+   where *** is the argument string to CURRENNT.
+   To compile a version of currennt for debugging, please check README in
+   https://github.com/nii-yamagishilab/project-CURRENNT-public/tree/master/CURRENNT_codes
+
+
+----------
+Error messages
+
+1. Memory error when using CURRENNT
+
+   'thrust::system::system_error'
+    what():  device free failed: an illegal memory access was encountered
+    Aborted (core dumped)
+
+    or 
+
+    Could not create layer: __copy::trivial_device_copy H->D: failed: invalid argument
+
+    The two errors above indicate insufficient GPU memory.
+    Either reduce layer size, utterance length, or ask Xin Wang
+
+2. Scripts configuration error:
+    
+    resolution not found in --resolutionsFAILED: Resolution error
+
+    This means that upsampling_rate in wavefor-modeling/*/config.py is not correctly
+    configured. Note that this upsampling_rate denotes the up-sampling of acoustic
+    features (from frame-level to waveform-sampling-level), its value should be equal
+    to frame_shift * sampling_rate_of_waveform. See config.py for example
+
+

@@ -1,0 +1,44 @@
+N###########################################################################
+##  pyTools for CURRENNT  ----------------------------------------------  #
+## ---------------------------------------------------------------------  #
+##                                                                        #
+##  Copyright (c) 2018  National Institute of Informatics                 #
+##                                                                        #
+##  THE NATIONAL INSTITUTE OF INFORMATICS AND THE CONTRIBUTORS TO THIS    #
+##  WORK DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING  #
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT    #
+##  SHALL THE NATIONAL INSTITUTE OF INFORMATICS NOR THE CONTRIBUTORS      #
+##  BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY   #
+##  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,       #
+##  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS        #
+##  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE   #
+##  OF THIS SOFTWARE.                                                     #
+###########################################################################
+##                         Author: Xin Wang                               #
+##                         Date:   2016 - 2018                            #
+##                         Contact: wangxin at nii.ac.jp                  #
+###########################################################################
+
+Tools based on Python (Python 2.7, not fully test on Python3.5)
+
+To add this pyTools to python path, please
+$: export PYTHONPATH=PATH_TO_THIS_DIRECTORY:$PYTHONPATH
+
+There tools are used in CURRENNT_SCIRPTS implicitly. So, no need to write
+instruction here.
+
+However, the binary data handler may be useful if you want to check and plot
+the data used by CURRENNT. 
+
+See the example below to read and write binary data
+(litten endian, float32)
+
+>> from ioTools import readwrite as py_rw
+>> data = py_rw.read_raw_mat(PATH_TO_BINARY_DATA, DIMENSION_OF_DATA)
+>> py_rw.write_raw_mat(data, PATH_TO_BINARY_DATA)
+
+
+Optional:
+If you want to use a compiled data IO interface:
+$: sh setup.sh
+You need Cython to compil.e

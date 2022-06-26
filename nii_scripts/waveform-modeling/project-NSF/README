@@ -1,0 +1,155 @@
+###########################################################################
+##  Scripts for NSF model ----------------------------------------------  #
+## ---------------------------------------------------------------------  #
+##                                                                        #
+##  Copyright (c) 2018-2019  National Institute of Informatics            #
+##                                                                        #
+##  THE NATIONAL INSTITUTE OF INFORMATICS AND THE CONTRIBUTORS TO THIS    #
+##  WORK DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING  #
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT    #
+##  SHALL THE NATIONAL INSTITUTE OF INFORMATICS NOR THE CONTRIBUTORS      #
+##  BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY   #
+##  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,       #
+##  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS        #
+##  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE   #
+##  OF THIS SOFTWARE.                                                     #
+###########################################################################
+##                         Author: Xin Wang                               #
+##                         Date:   31 Oct. 2018                           #
+##                         Contact: wangxin at nii.ac.jp                  #
+###########################################################################
+
+It is recommeded to trying projects/waveform-modeling/NSF-pretrained at first.
+That script contains pre-trained model and can generated waveforms.
+
+This script demonstrate how to prepare data, train NSF, and generate speech. 
+
+You may use the CMU-arctic database, SLT voice
+(http://festvox.org/cmu_arctic/dbs_slt.html).
+
+The network files in MODELS correspond to:
+1. NSF: original NSF (for ICASSP2019)
+2. NSF-L3: original NSF using only one window configuration
+3. NSF-MSE: original NSF using MSE not STFT criterion
+4. NSF-N2: origional NSF with b = 0 in normalization flow (x * b + a)
+5. NSF-S3: original NSF without sine excitation
+
+6. s-NSF: simplified NSF model
+7. h-NSF: harmonic-plus-noise NSF model with fixed low- and high-pass FIR filters
+8. h-sinc-NSF: harmonic-plus-noise NSF model with sinc-based trainable FIR filters
+
+
+NSF is the first version of the NSF models.
+s-NSF is the second version.
+h-NSF is the third version, and performs better than s-NSF and NSF on most voices.
+
+h-sinc-NSF is the lastest, most robust model (https://www.isca-speech.org/archive/SSW_2019/pdfs/SSW10_O_1-1.pdf)
+
+
+You can use the same script to train any one of the models.
+Just change "model_dir" in config.py to select one of the models.
+For example, the default is model_dir = prjdir + '/MODELS/h-sinc-NSF', which will use the h-sinc-NSF
+
+
+Please follow the steps to run the scripts
+
+Note: 
+CURRENNT is not that flexible if you are a tensorflow/theano/pyTorch/chainer user.
+Please check the slides of CURRENNT on http://tonywangx.github.io/slides.html,
+especially, the two slides on WaveNet:
+http://tonywangx.github.io/pdfs/CURRENNT_WAVENET.pdf
+http://tonywangx.github.io/pdfs/wavenet.pdf
+
+------------------------------------
+---
+Step1. prepare software enviroment
+
+1.1 pyTools:  https://github.com/nii-yamagishilab/project-CURRENNT-public
+    please compile it following pyTools/README
+    
+1.2 CURRENNT: https://github.com/nii-yamagishilab/project-CURRENNT-public
+    please compile it following CURRENNT-modified/README
+    
+1.3 python2, with Numpy and Scipy
+
+---
+Step2. For a quick test on the scripts, you can skip Step2 and Step3.
+    If you want to train a full model, put data from CMU-arctic SLT to ./DATA
+
+2.1 F0: f0.tar.gz is included in ../DATA/, which includes F0 for train/val sets.
+    Please untar it.
+    
+2.2 mel-spectrogram: please use your scripts to extract them.
+    To be compatible with F0, please use a frame shift of 5ms;
+    I use mel-spectrogram of 80 dimensions.
+    
+2.3 waveform: just download the waveform from CMU-arctic SLT.
+    I used 32kHz (for historical reason).
+    Waveform will be downsampled to 16kHz by the scripts.
+    
+2.4 put F0 in ../DATA/f0 as *.f0,
+    put waveform in ../DATA/wav32k as *.wav,
+    put mel-spec in ../DATA/mfbsp as *.mfbsp 
+
+
+In fact, mel-spec can be any type of spectral features.
+You can put mgc, mfcc, etc. Just remember to change the feature dimension
+and feature file name extension in config.py
+
+
+---
+Step3. configure config.py and train_config.cfg
+
+   Please open and read the comments in config.py
+   Please open and read the comments in train_config.cfg
+   
+---
+Step4. data preparation and model training
+
+    sh 00_run.sh
+
+    If you want to shorten the number of epochs (50 by default),
+    please change max_epochs in ./train_config.cfg
+    
+    Don't be surprised if you see the network with ~500 'layers'.
+    In my implementation, each 'layer' may only correspond to a single
+    operation (e.g., adding, weighting) in tensorflow.
+    
+    Don't be surprised if you see the training and validation sentences
+    number are larger than what is provided. Utterance are truncated
+    into short utterances in order to fit in the GPU. This truncation
+    size is specified in ./train_config.cfg truncate_seq=
+
+    For reference, I uploaded my log_train in ../project-NSF-v2-pretrained
+    or ../ project-NSF-pretrained. Please untar MODELS/models.tar.gz and
+    you will find log_train for each model.
+   
+---
+Step5. generate waveforms
+
+5.1 A few sample data have been prepared. You can skip step5.1
+    if you have used the provided training data in Step2.
+    Otherwise, put F0 and mel-spec of test set in TESTDATA/f0 and TESTDATA/mfbsp
+
+5.2 run 
+    $: sh 01_gen.sh
+
+    If your GPU card has sufficient memory, you may try the normal mode.
+    The normal mode can generate waveform in full speed.
+    To do that:
+    1. change mem_save_mode = 0 in config.py
+    2. sh 01_gen.sh
+
+    Note:
+    mem_save_mode = 0 -> normal mode, faster but requires large GPU memory space
+    mem_save_mode = 1 -> memory_save mode, slightly slower but memory friendly
+
+    If your GPU memory is insufficient while mem_save_mode = 0, you may see
+    the script terminated without generating any waveform.
+
+    If you want to check early results, you can
+    generate waveforms by changing MODEL to $PWD/MODELS/NSF/epoch***.autosave,
+    where *** denotes the training epoch.
+    
+--------------------------------
+

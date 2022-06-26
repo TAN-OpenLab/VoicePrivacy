@@ -1,0 +1,18 @@
+[submodule "kaldi"]
+	path = kaldi
+	url = https://github.com/kaldi-asr/kaldi.git
+[submodule "nii"]
+	path = nii
+	url = https://github.com/nii-yamagishilab/project-CURRENNT-public
+[submodule "nii_scripts"]
+	path = nii_scripts
+	url = https://github.com/nii-yamagishilab/project-CURRENNT-scripts
+[submodule "cllr"]
+	path = cllr
+	url = https://gitlab.eurecom.fr/nautsch/cllr.git
+[submodule "anonymization_metrics"]
+	path = anonymization_metrics
+	url = https://gitlab.inria.fr/magnet/anonymization_metrics.git
+[submodule "zebra"]
+	path = zebra
+	url = https://gitlab.eurecom.fr/nautsch/zebra.git
